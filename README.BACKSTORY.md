@@ -14,7 +14,7 @@ To be clear none of this is a dis or dunk on Gas Town - it's an ambitious projec
 
 **It's opinionated in ways that don't fit my workflow.** Merging to main is almost a requirement, which is incompatible with PR-based workflows. The polecat workflow encodes `go test` as a requirement for success, and AFAIK that formula isn't yet parameterizable. You can fix it by forking and maintaining your own version, but things are moving fast over there and keeping up with main takes daily diligence.
 
-**Beads** are difficult to manage and the polecats create them in unexpected ways. Duplicates are common and work is duplicated. Sometimes you don't even notice a swarm of polecats created 10 new issues to fix tests on main until they've all been processed and you've blown the budget. You end up with `.beads` directories everywhere. It's unclear what's in JSONL and what's in SQLite.
+**Beads** are difficult to manage and the polecats create them in unexpected ways. Duplicates are common and work is duplicated. Sometimes you don't even notice a swarm of polecats created 10 new issues to fix tests on main until they've all been processed and you've blown the budget. You end up with `.beads` directories everywhere. It's unclear what's in JSONL and what's in SQLite. The gastown maintainers are aware and they're working on migrating the backend to dolt. It's quite complicated.
 
 **The mail sub-system** uses tmux send-keys to send messages between the claude codes. That's fine unless you're in the middle of typing out a big prompt to the mayor when he gets mail. When that happens whatever you have written gets sent to Claude along with the mail notification.
 
