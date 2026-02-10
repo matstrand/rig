@@ -2,7 +2,7 @@
 
 Rig manages tmux-based development environments where each repo runs as an independent tmux session.
 
-The backstory is [here](README.BACKGROUND.md).
+The backstory is [here](README.BACKSTORY.md).
 
 ## Installation
 
@@ -216,8 +216,8 @@ Crew workspaces enable multiple people (or personas) to work on the same repo si
 
 ```
 ~/git/notes/              # Main repo
-~/crew/tracy/notes/       # Tracy's worktree (branch: tracy/work)
-~/crew/alex/notes/        # Alex's worktree (branch: alex/work)
+~/crew/notes/tracy/       # Tracy's worktree (branch: tracy/work)
+~/crew/notes/alex/        # Alex's worktree (branch: alex/work)
 
 Sessions:
 - notes              (main rig)
@@ -239,7 +239,7 @@ rig crew add tracy --rig=notes
 ```
 
 This creates:
-- `~/crew/tracy/notes/` (git worktree)
+- `~/crew/notes/tracy/` (git worktree)
 - `tracy/work` branch (from `main` or `$RIG_DEFAULT_BRANCH`)
 - `notes@tracy` tmux session (Claude Code + Terminal)
 
@@ -284,8 +284,8 @@ Output:
 ```
 === Active Crew Sessions ===
 
-notes@tracy      ~/crew/tracy/notes       tracy/work    [running]
-notes@alex       ~/crew/alex/notes        alex/work     [running]
+notes@tracy      ~/crew/notes/tracy       tracy/work    [running]
+notes@alex       ~/crew/notes/alex        alex/work     [running]
 ```
 
 #### Remove a crew workspace
@@ -315,8 +315,8 @@ rig status
 #     └─ ~/git/notes
 #
 # === Crew ===
-#   notes@tracy (tracy/notes)
-#     └─ ~/crew/tracy/notes
+#   notes@tracy (notes/tracy)
+#     └─ ~/crew/notes/tracy
 
 # Switch to crew sessions
 rig switch notes@tracy        # Switch to crew session
