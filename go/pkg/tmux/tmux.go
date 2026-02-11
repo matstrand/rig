@@ -8,8 +8,16 @@ import (
 	"time"
 )
 
+// NormalizeSessionName converts a session name to be tmux-compatible.
+// Tmux automatically converts periods to underscores in session names,
+// so we normalize them to prevent mismatches.
+func NormalizeSessionName(name string) string {
+	return strings.ReplaceAll(name, ".", "_")
+}
+
 // SessionExists checks if a tmux session exists
 func SessionExists(name string) bool {
+	name = NormalizeSessionName(name)
 	cmd := exec.Command("tmux", "has-session", "-t", name)
 	return cmd.Run() == nil
 }
@@ -32,12 +40,14 @@ func ListSessions() ([]string, error) {
 
 // KillSession kills a tmux session
 func KillSession(name string) error {
+	name = NormalizeSessionName(name)
 	cmd := exec.Command("tmux", "kill-session", "-t", name)
 	return cmd.Run()
 }
 
 // AttachSession attaches to a tmux session
 func AttachSession(name string, useCC bool) error {
+	name = NormalizeSessionName(name)
 	inTmux := os.Getenv("TMUX") != ""
 
 	if inTmux {
@@ -83,6 +93,7 @@ func AttachDefault(useCC bool) error {
 
 // CreateRigSession creates a tmux session for a rig
 func CreateRigSession(name, repoPath string, useCC bool) error {
+	name = NormalizeSessionName(name)
 	if useCC {
 		return createRigSessionCC(name, repoPath)
 	}
@@ -162,6 +173,7 @@ func createRigSessionCC(name, repoPath string) error {
 
 // CreateCrewSession creates a tmux session for a crew member
 func CreateCrewSession(sessionName, crewPath, rigName, memberName, branchName string, useCC bool) error {
+	sessionName = NormalizeSessionName(sessionName)
 	if useCC {
 		return createCrewSessionCC(sessionName, crewPath, rigName, memberName, branchName)
 	}
