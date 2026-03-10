@@ -104,7 +104,7 @@ func upCmd() *cobra.Command {
 			fmt.Printf("Creating new rig: %s\n", name)
 			fmt.Printf("Repo: %s\n", repoPath)
 
-			if err := tmux.CreateRigSession(sessionName, repoPath, cfg.UseCC); err != nil {
+			if err := tmux.CreateRigSession(sessionName, repoPath, cfg.UseCC, cfg.ClaudeInitPrompt); err != nil {
 				return fmt.Errorf("failed to create rig session: %w", err)
 			}
 
@@ -1370,7 +1370,7 @@ func slingCmd() *cobra.Command {
 			fmt.Printf("✓ Branch: %s\n", featureBranch)
 
 			// Create tmux session
-			if err := tmux.CreateCrewSession(sessionName, crewPath, rigName, polecatName, featureBranch, cfg.UseCC); err != nil {
+			if err := tmux.CreateCrewSession(sessionName, crewPath, rigName, polecatName, featureBranch, cfg.UseCC, cfg.ClaudeInitPrompt); err != nil {
 				// Cleanup on failure
 				git.RemoveWorktree(repoPath, crewPath)
 				git.PruneWorktrees(repoPath)

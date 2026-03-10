@@ -11,6 +11,7 @@ type Config struct {
 	CrewBase         string
 	UseCC            bool
 	DefaultBranch    string
+	ClaudeInitPrompt string
 }
 
 // Load reads configuration from environment variables
@@ -34,11 +35,14 @@ func Load() *Config {
 		defaultBranch = "main"
 	}
 
+	claudeInitPrompt := os.Getenv("RIG_CLAUDE_INIT_PROMPT")
+
 	return &Config{
-		RigsBase:      rigsBase,
-		CrewBase:      crewBase,
-		UseCC:         useCC,
-		DefaultBranch: defaultBranch,
+		RigsBase:         rigsBase,
+		CrewBase:         crewBase,
+		UseCC:            useCC,
+		DefaultBranch:    defaultBranch,
+		ClaudeInitPrompt: claudeInitPrompt,
 	}
 }
 

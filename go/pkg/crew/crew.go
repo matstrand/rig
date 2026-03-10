@@ -124,7 +124,7 @@ func Add(cfg *config.Config, name, rigName string) error {
 		fmt.Printf("Crew workspace exists but session is not running\n")
 		fmt.Printf("Recreating session...\n")
 
-		if err := tmux.CreateCrewSession(sessionName, crewPath, rigName, name, branchName, cfg.UseCC); err != nil {
+		if err := tmux.CreateCrewSession(sessionName, crewPath, rigName, name, branchName, cfg.UseCC, cfg.ClaudeInitPrompt); err != nil {
 			return fmt.Errorf("failed to recreate session: %w", err)
 		}
 
@@ -171,7 +171,7 @@ func Add(cfg *config.Config, name, rigName string) error {
 	fmt.Printf("✓ Crew workspace created: %s\n", crewPath)
 
 	// Create tmux session
-	if err := tmux.CreateCrewSession(sessionName, crewPath, rigName, name, branchName, cfg.UseCC); err != nil {
+	if err := tmux.CreateCrewSession(sessionName, crewPath, rigName, name, branchName, cfg.UseCC, cfg.ClaudeInitPrompt); err != nil {
 		fmt.Printf("Session creation failed, cleaning up worktree...\n")
 		cleanupWorktree(repoPath, crewPath, branchName)
 		return fmt.Errorf("failed to create session: %w", err)
@@ -191,32 +191,22 @@ func Start(cfg *config.Config, name, rigName string) error {
 
 	crewPath := cfg.GetCrewPath(rigName, name)
 	sessionName := cfg.GetCrewSessionName(rigName, name)
-	branchName := cfg.GetCrewBranchName(name)
 
 	// Check if worktree exists
 	if _, err := os.Stat(crewPath); os.IsNotExist(err) {
 		return fmt.Errorf("crew workspace not found: %s\nUse 'rig crew add %s --rig=%s' first", crewPath, name, rigName)
 	}
 
-	// Verify we're on the expected branch
-	currentBranch, err := git.GetCurrentBranch(crewPath)
-	if err == nil && currentBranch != "" && currentBranch != branchName {
-		fmt.Printf("Workspace is on branch '%s', expected '%s'\n", currentBranch, branchName)
-		fmt.Printf("Switch to %s? [Y/n] ", branchName)
-		var response string
-		fmt.Scanln(&response)
-		if strings.ToLower(response) != "n" {
-			if err := git.CheckoutBranch(crewPath, branchName); err != nil {
-				return fmt.Errorf("failed to switch to branch %s: %w", branchName, err)
-			}
-			fmt.Printf("✓ Switched to branch %s\n", branchName)
-		}
+	// Get the actual branch the worktree is on
+	branchName, err := git.GetCurrentBranch(crewPath)
+	if err != nil {
+		branchName = name + "/work"
 	}
 
 	// Check if session exists
 	if !tmux.SessionExists(sessionName) {
 		fmt.Printf("Session doesn't exist, recreating...\n")
-		if err := tmux.CreateCrewSession(sessionName, crewPath, rigName, name, branchName, cfg.UseCC); err != nil {
+		if err := tmux.CreateCrewSession(sessionName, crewPath, rigName, name, branchName, cfg.UseCC, cfg.ClaudeInitPrompt); err != nil {
 			return fmt.Errorf("failed to create session: %w", err)
 		}
 		fmt.Printf("✓ Session created: %s\n", sessionName)

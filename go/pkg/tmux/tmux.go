@@ -92,15 +92,15 @@ func AttachDefault(useCC bool) error {
 }
 
 // CreateRigSession creates a tmux session for a rig
-func CreateRigSession(name, repoPath string, useCC bool) error {
+func CreateRigSession(name, repoPath string, useCC bool, initPrompt string) error {
 	name = NormalizeSessionName(name)
 	if useCC {
-		return createRigSessionCC(name, repoPath)
+		return createRigSessionCC(name, repoPath, initPrompt)
 	}
-	return createRigSessionNative(name, repoPath)
+	return createRigSessionNative(name, repoPath, initPrompt)
 }
 
-func createRigSessionNative(name, repoPath string) error {
+func createRigSessionNative(name, repoPath string, initPrompt string) error {
 	// Create session with first window (Claude Code)
 	cmd := exec.Command("tmux", "new-session", "-d", "-s", name, "-n", "Claude Code", "-c", repoPath)
 	if err := cmd.Run(); err != nil {
@@ -111,6 +111,12 @@ func createRigSessionNative(name, repoPath string) error {
 	sendKeys(name+":1", "cd "+repoPath)
 	time.Sleep(100 * time.Millisecond)
 	sendKeys(name+":1", "claude")
+
+	// Send initial prompt if configured
+	if initPrompt != "" {
+		time.Sleep(2 * time.Second) // Wait for Claude Code to start
+		sendKeys(name+":1", initPrompt)
+	}
 
 	// Create second window (Terminal)
 	cmd = exec.Command("tmux", "new-window", "-t", name, "-n", "Terminal", "-c", repoPath)
@@ -128,7 +134,7 @@ func createRigSessionNative(name, repoPath string) error {
 	return cmd.Run()
 }
 
-func createRigSessionCC(name, repoPath string) error {
+func createRigSessionCC(name, repoPath string, initPrompt string) error {
 	// Create session with single window (add emoji to window name for iTerm2)
 	windowName := "🏗️  " + name
 	cmd := exec.Command("tmux", "new-session", "-d", "-s", name, "-n", windowName, "-c", repoPath)
@@ -163,6 +169,12 @@ func createRigSessionCC(name, repoPath string) error {
 	time.Sleep(100 * time.Millisecond)
 	sendKeys(name+":.1", "claude")
 
+	// Send initial prompt if configured
+	if initPrompt != "" {
+		time.Sleep(2 * time.Second) // Wait for Claude Code to start
+		sendKeys(name+":.1", initPrompt)
+	}
+
 	// Terminal pane
 	sendKeys(name+":.2", "cd "+repoPath)
 	sendKeys(name+":.2", fmt.Sprintf("echo '# %s terminal'", name))
@@ -172,15 +184,15 @@ func createRigSessionCC(name, repoPath string) error {
 }
 
 // CreateCrewSession creates a tmux session for a crew member
-func CreateCrewSession(sessionName, crewPath, rigName, memberName, branchName string, useCC bool) error {
+func CreateCrewSession(sessionName, crewPath, rigName, memberName, branchName string, useCC bool, initPrompt string) error {
 	sessionName = NormalizeSessionName(sessionName)
 	if useCC {
-		return createCrewSessionCC(sessionName, crewPath, rigName, memberName, branchName)
+		return createCrewSessionCC(sessionName, crewPath, rigName, memberName, branchName, initPrompt)
 	}
-	return createCrewSessionNative(sessionName, crewPath, rigName, memberName, branchName)
+	return createCrewSessionNative(sessionName, crewPath, rigName, memberName, branchName, initPrompt)
 }
 
-func createCrewSessionNative(sessionName, crewPath, rigName, memberName, branchName string) error {
+func createCrewSessionNative(sessionName, crewPath, rigName, memberName, branchName string, initPrompt string) error {
 	// Create session with first window
 	cmd := exec.Command("tmux", "new-session", "-d", "-s", sessionName, "-n", "Claude Code", "-c", crewPath)
 	if err := cmd.Run(); err != nil {
@@ -191,6 +203,12 @@ func createCrewSessionNative(sessionName, crewPath, rigName, memberName, branchN
 	sendKeys(sessionName+":1", "cd "+crewPath)
 	time.Sleep(100 * time.Millisecond)
 	sendKeys(sessionName+":1", "claude")
+
+	// Send initial prompt if configured
+	if initPrompt != "" {
+		time.Sleep(2 * time.Second) // Wait for Claude Code to start
+		sendKeys(sessionName+":1", initPrompt)
+	}
 
 	// Create second window
 	cmd = exec.Command("tmux", "new-window", "-t", sessionName, "-n", "Terminal", "-c", crewPath)
@@ -207,7 +225,7 @@ func createCrewSessionNative(sessionName, crewPath, rigName, memberName, branchN
 	return cmd.Run()
 }
 
-func createCrewSessionCC(sessionName, crewPath, rigName, memberName, branchName string) error {
+func createCrewSessionCC(sessionName, crewPath, rigName, memberName, branchName string, initPrompt string) error {
 	// Determine emoji based on crew type
 	emoji := "👤"
 	if strings.HasPrefix(memberName, "polecat_") {
@@ -235,6 +253,12 @@ func createCrewSessionCC(sessionName, crewPath, rigName, memberName, branchName 
 	sendKeys(sessionName+":.1", "cd "+crewPath)
 	time.Sleep(100 * time.Millisecond)
 	sendKeys(sessionName+":.1", "claude")
+
+	// Send initial prompt if configured
+	if initPrompt != "" {
+		time.Sleep(2 * time.Second) // Wait for Claude Code to start
+		sendKeys(sessionName+":.1", initPrompt)
+	}
 
 	sendKeys(sessionName+":.2", "cd "+crewPath)
 	sendKeys(sessionName+":.2", fmt.Sprintf("echo '# %s on %s (branch: %s)'", memberName, rigName, branchName))

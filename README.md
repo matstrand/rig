@@ -165,11 +165,15 @@ export RIGS_BASE="$HOME/projects"
 
 # Use iTerm2 integration mode (default: false)
 export RIG_USE_CC=true
+
+# Initial prompt to send to Claude Code when it starts (default: none)
+export RIG_CLAUDE_INIT_PROMPT="get ready"
 ```
 
 Or set per-command:
 ```bash
 RIG_USE_CC=true rig up myrepo
+RIG_CLAUDE_INIT_PROMPT="get ready" rig up myrepo
 ```
 
 ## Examples
